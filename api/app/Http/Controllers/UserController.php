@@ -20,7 +20,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
@@ -28,8 +28,30 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+    $validatedData = $request->validate([
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:8',
+        'user_name' => 'nullable|string|max:255',
+    ]);
+
+    $userName = $validatedData['user_name'] ?? 'Anonimo';
+
+    if ($userName !== 'Anonimo') {
+        $existingUser = User::where('user_name', $userName)->first();
+        if ($existingUser) {
+            return response()->json(['error' => 'El nombre de usuario ya está en uso.'], 422);
+        }
     }
+
+    $user = User::create([
+        'email' => $validatedData['email'],
+        'password' => bcrypt($validatedData['password']),
+        'user_name' => $userName,
+    ]);
+
+    return response()->json(['message' => 'Usuario creado correctamente', 'user' => $user], 201);
+    }
+
 
     /**
      * Display the specified resource.
