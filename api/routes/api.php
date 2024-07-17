@@ -9,7 +9,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::post('/players', [UserController::class, 'create']);
+Route::post('/players', [UserController::class, 'store']);
 
 Route::put('/players/{id}', [UserController::class, 'update']);
 
