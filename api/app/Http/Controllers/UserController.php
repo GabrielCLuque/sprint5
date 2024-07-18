@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Game;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -12,7 +13,181 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $users = User::all();
+        $games = Game::all();
+
+        //añado arrays a parte para calcular winratios segun el id de cada user
+        $ratio = array();
+        $ratiopercentage = array();
+
+        foreach ($users as $user) {
+            $ratio[$user->id] = ['user_name' => $user->user_name, 'victorias' => [] ];
+        }
+
+        foreach ($games as $game) {
+            if (isset($ratio[$game->user_id])) {
+                $ratio[$game->user_id]['victorias'][] = $game->victoria;
+            }
+        }
+
+        foreach ($ratio as $user) {
+            $totalVictorias = count($user['victorias']);
+            $victoriasConValor1 = count(array_filter($user['victorias'], function($v) {
+                return $v == 1;
+            }));
+
+            $percentage = ($totalVictorias > 0) ? ($victoriasConValor1 / $totalVictorias) * 100 : 0;
+
+            $ratiopercentage[] = [ 'user_name' => $user['user_name'], 'percentage' => $percentage ];
+        }
+
+        return response()->json($ratiopercentage, 201);
+    }
+
+//busca al peor jugador, si hay mas de uno muestra a ambos, nunca muestra a un jugador con 0 jugadas
+    public function getTheBiggestLoser() {
+        $users = User::all();
+        $games = Game::all();
+
+        $ratio = array();
+        $lowestUsers = [];
+        $lowestPercentage = null;
+
+        foreach ($users as $user) {
+            $ratio[$user->id] = [
+                'user_name' => $user->user_name,
+                'victorias' => []
+            ];
+        }
+
+        foreach ($games as $game) {
+            if (isset($ratio[$game->user_id])) {
+                $ratio[$game->user_id]['victorias'][] = $game->victoria;
+            }
+        }
+
+        foreach ($ratio as $user) {
+            $totalVictorias = count($user['victorias']);
+            if ($totalVictorias > 0) {
+                $victoriasConValor1 = count(array_filter($user['victorias'], function($v) {
+                    return $v == 1;
+                }));
+
+                $percentage = ($victoriasConValor1 / $totalVictorias) * 100;
+
+                if ($lowestPercentage === null || $percentage < $lowestPercentage) {
+                    $lowestPercentage = $percentage;
+                    $lowestUsers = [[
+                        'user_name' => $user['user_name'],
+                        'percentage' => $percentage
+                    ]];
+                } elseif ($percentage == $lowestPercentage) {
+                    $lowestUsers[] = [
+                        'user_name' => $user['user_name'],
+                        'percentage' => $percentage
+                    ];
+                }
+            }
+        }
+
+        if (empty($lowestUsers)) {
+            return response()->json(['message' => 'No users with victories'], 404);
+        }
+
+        return response()->json($lowestUsers, 201);
+    }
+
+    //practicamente la misma logica pero para el user con más victorias, los que no hayan jugado nunca tampoco se tienen en cuenta
+
+    public function getAllUsersWithPercentages() {
+        $users = User::all();
+        $games = Game::all();
+
+        $ratio = array();
+        $ratiopercentage = array();
+
+        foreach ($users as $user) {
+            $ratio[$user->id] = [
+                'user_name' => $user->name,
+                'victorias' => []
+            ];
+        }
+
+        foreach ($games as $game) {
+            if (isset($ratio[$game->user_id])) {
+                $ratio[$game->user_id]['victorias'][] = $game->victoria;
+            }
+        }
+
+        foreach ($ratio as $user) {
+            $totalVictorias = count($user['victorias']);
+            if ($totalVictorias > 0) {
+                $victoriasConValor1 = count(array_filter($user['victorias'], function($v) {
+                    return $v == 1;
+                }));
+
+                $percentage = ($victoriasConValor1 / $totalVictorias) * 100;
+
+                $ratiopercentage[] = [
+                    'user_name' => $user['user_name'],
+                    'percentage' => $percentage
+                ];
+            }
+        }
+
+        return response()->json($ratiopercentage, 201);
+    }
+
+    public function getTheBiggestWinner() {
+        $users = User::all();
+        $games = Game::all();
+
+        $ratio = array();
+        $highestUsers = [];
+        $highestPercentage = null;
+
+        foreach ($users as $user) {
+            $ratio[$user->id] = [
+                'user_name' => $user->user_name,
+                'victorias' => []
+            ];
+        }
+
+        foreach ($games as $game) {
+            if (isset($ratio[$game->user_id])) {
+                $ratio[$game->user_id]['victorias'][] = $game->victoria;
+            }
+        }
+
+        foreach ($ratio as $user) {
+            $totalVictorias = count($user['victorias']);
+            if ($totalVictorias > 0) {
+                $victoriasConValor1 = count(array_filter($user['victorias'], function($v) {
+                    return $v == 1;
+                }));
+
+                $percentage = ($victoriasConValor1 / $totalVictorias) * 100;
+
+                if ($highestPercentage === null || $percentage > $highestPercentage) {
+                    $highestPercentage = $percentage;
+                    $highestUsers = [[
+                        'user_name' => $user['user_name'],
+                        'percentage' => $percentage
+                    ]];
+                } elseif ($percentage == $highestPercentage) {
+                    $highestUsers[] = [
+                        'user_name' => $user['user_name'],
+                        'percentage' => $percentage
+                    ];
+                }
+            }
+        }
+
+        if (empty($highestUsers)) {
+            return response()->json(['message' => 'No users with victories'], 404);
+        }
+
+        return response()->json($highestUsers, 201);
     }
 
     /**
