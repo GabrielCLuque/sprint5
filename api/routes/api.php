@@ -17,7 +17,7 @@ Route::post('/players/{id}/games', [GameController::class, 'create']);
 
 Route::delete('/players/{id}/games', [GameController::class, 'delete']);
 
-Route::get('/players', [UserController::class, 'showAll']);
+Route::get('/players', [UserController::class, 'index']);
 
 Route::get('/players/{id}/games', [GameController::class, 'show']);
 

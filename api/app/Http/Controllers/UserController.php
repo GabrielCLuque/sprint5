@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Game;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -12,7 +13,35 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $users = User::all();
+        $games = Game::all();
+
+        //añado arrays a parte para calcular winratios segun el id de cada user
+        $ratio = array();
+        $ratiopercentage = array();
+
+        foreach ($users as $user) {
+            $ratio[$user->id] = ['user_name' => $user->user_name, 'victorias' => [] ];
+        }
+
+        foreach ($games as $game) {
+            if (isset($ratio[$game->user_id])) {
+                $ratio[$game->user_id]['victorias'][] = $game->victoria;
+            }
+        }
+
+        foreach ($ratio as $user) {
+            $totalVictorias = count($user['victorias']);
+            $victoriasConValor1 = count(array_filter($user['victorias'], function($v) {
+                return $v == 1;
+            }));
+
+            $percentage = ($totalVictorias > 0) ? ($victoriasConValor1 / $totalVictorias) * 100 : 0;
+
+            $ratiopercentage[] = [ 'user_name' => $user['user_name'], 'percentage' => $percentage ];
+        }
+
+        return response()->json($ratiopercentage, 201);
     }
 
     /**
