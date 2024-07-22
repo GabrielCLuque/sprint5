@@ -14,7 +14,7 @@ Route::post('/players', [UserController::class, 'store']);
 
 Route::put('/players/{id}', [UserController::class, 'update']);
 
-Route::post('/players/{id}/games', [GameController::class, 'create']);
+Route::post('/players/{id}/games', [GameController::class, 'store']);
 
 Route::delete('/players/{id}/games', [GameController::class, 'delete']);
 
