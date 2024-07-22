@@ -22,7 +22,7 @@ Route::get('/players', [UserController::class, 'index']);
 
 Route::get('/players/{id}/games', [GameController::class, 'show']);
 
-Route::get('/players/ranking', [UserController::class, 'showRanking']);
+Route::get('/players/ranking', [UserController::class, 'getAverageRanking']);
 
 Route::get('/players/ranking/loser', [UserController::class, 'getTheBiggestLoser']);
 
