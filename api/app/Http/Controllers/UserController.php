@@ -43,6 +43,51 @@ class UserController extends Controller
 
         return response()->json($ratiopercentage, 201);
     }
+    //devuelve la media
+    public function getAverageRanking()
+    {
+        $users = User::all();
+        $games = Game::all();
+
+        $ratio = array();
+        $totalPercentage = 0;
+        $validUsersCount = 0;
+
+        foreach ($users as $user) {
+            $ratio[$user->id] = [
+                'user_name' => $user->user_name,
+                'victorias' => []
+            ];
+        }
+
+        foreach ($games as $game) {
+            if (isset($ratio[$game->user_id])) {
+                $ratio[$game->user_id]['victorias'][] = $game->victoria;
+            }
+        }
+
+        foreach ($ratio as $user) {
+            $totalVictorias = count($user['victorias']);
+            if ($totalVictorias > 0) {
+                $victoriasConValor1 = count(array_filter($user['victorias'], function($v) {
+                    return $v == 1;
+                }));
+
+                $percentage = ($victoriasConValor1 / $totalVictorias) * 100;
+
+                $totalPercentage += $percentage;
+                $validUsersCount++;
+            }
+        }
+
+        if ($validUsersCount > 0) {
+            $averagePercentage = $totalPercentage / $validUsersCount;
+        } else {
+            $averagePercentage = 0;
+        }
+
+        return response()->json(['average_percentage' => $averagePercentage], 200);
+    }
 
 //busca al peor jugador, si hay mas de uno muestra a ambos, nunca muestra a un jugador con 0 jugadas
     public function getTheBiggestLoser() {
