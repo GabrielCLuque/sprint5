@@ -44,14 +44,12 @@ class UserController extends Controller
         return response()->json($ratiopercentage, 201);
     }
     //devuelve la media
-    public function getAverageRanking()
+    public function ranking()
     {
         $users = User::all();
         $games = Game::all();
 
         $ratio = array();
-        $totalPercentage = 0;
-        $validUsersCount = 0;
 
         foreach ($users as $user) {
             $ratio[$user->id] = [
@@ -66,6 +64,8 @@ class UserController extends Controller
             }
         }
 
+        $ranking = [];
+
         foreach ($ratio as $user) {
             $totalVictorias = count($user['victorias']);
             if ($totalVictorias > 0) {
@@ -75,18 +75,18 @@ class UserController extends Controller
 
                 $percentage = ($victoriasConValor1 / $totalVictorias) * 100;
 
-                $totalPercentage += $percentage;
-                $validUsersCount++;
+                $ranking[] = [
+                    'user_name' => $user['user_name'],
+                    'percentage' => $percentage
+                ];
             }
         }
 
-        if ($validUsersCount > 0) {
-            $averagePercentage = $totalPercentage / $validUsersCount;
-        } else {
-            $averagePercentage = 0;
-        }
+        usort($ranking, function($a, $b) {
+            return $b['percentage'] <=> $a['percentage'];
+        });
 
-        return response()->json(['average_percentage' => $averagePercentage], 200);
+        return response()->json($ranking, 200);
     }
 
 //busca al peor jugador, si hay mas de uno muestra a ambos, nunca muestra a un jugador con 0 jugadas
