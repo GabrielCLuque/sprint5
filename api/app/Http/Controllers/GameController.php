@@ -27,11 +27,28 @@ class GameController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store($user_id)
     {
-        //
-    }
+        $resultado_tirada_1 = rand(1, 6);
+        $resultado_tirada_2 = rand(1, 6);
+        $resultado_final = $resultado_tirada_1 + $resultado_tirada_2;
+        $victoria = $resultado_final == 7 ? 1 : 0;
 
+        $game = new Game();
+        $game->user_id = $user_id;
+        $game->resultado_tirada_1 = $resultado_tirada_1;
+        $game->resultado_tirada_2 = $resultado_tirada_2;
+        $game->resultado_final = $resultado_final;
+        $game->victoria = $victoria;
+        $game->save();
+
+        $mensaje = "Resultado primer dado: $resultado_tirada_1, ";
+        $mensaje .= "Resultado segundo dado: $resultado_tirada_2, ";
+        $mensaje .= "Resultado final: $resultado_final, ";
+        $mensaje .= $victoria ? "Has ganado" : "Has perdido";
+
+        return response()->json(['message' => $mensaje], 201);
+    }
     /**
      * Display the specified resource.
      */
