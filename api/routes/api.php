@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GameController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\API\AuthController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -14,7 +14,6 @@ Route::post('/players', [UserController::class, 'store']);
 
 Route::put('/players/{id}', [UserController::class, 'update']);
 
-Route::post('/players/{id}/games', [GameController::class, 'store']);
 
 Route::delete('/players/{id}/games', [GameController::class, 'delete']);
 
@@ -30,3 +29,8 @@ Route::get('/players/ranking/loser', [UserController::class, 'getTheBiggestLoser
 Route::get('/players/ranking/winner', [UserController::class, 'getTheBiggestWinner']);
 
 Route::post('login', [AuthController::class, 'login']);
+
+Route::middleware('auth:api')->group(function() {
+    Route::post('/players/{id}/games', [GameController::class, 'store']);
+});
+
