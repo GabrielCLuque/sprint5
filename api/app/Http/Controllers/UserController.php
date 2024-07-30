@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\Game;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Auth;
 class UserController extends Controller
 {
     /**
@@ -14,6 +14,8 @@ class UserController extends Controller
      */
     public function index()
     {
+
+    if (Auth::user()->admin_status === 1){
         $users = User::all();
         $games = Game::all();
 
@@ -43,6 +45,10 @@ class UserController extends Controller
         }
 
         return response()->json($ratiopercentage, 201);
+        }
+        else{
+            return response()->json(['error'=>'Esta acción requiere el estatus de administrador'], 403);
+        }
     }
     //devuelve la media
     public function ranking()

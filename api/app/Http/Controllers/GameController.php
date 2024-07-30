@@ -59,6 +59,7 @@ class GameController extends Controller
      */
     public function show(int $id)
     {
+        if (Auth::user()->admin_status === 1){
         $user = User::find($id);
 
         if (!$user) {
@@ -85,6 +86,10 @@ class GameController extends Controller
         });
 
         return response()->json($games, 200);
+        }
+        else{
+            return response()->json(['error'=>'Esta acción requiere el estatus de administrador'], 403);
+        }
     }
 
     /**
