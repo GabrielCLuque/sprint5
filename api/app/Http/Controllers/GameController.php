@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Game;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 class GameController extends Controller
 {
     /**
@@ -29,6 +29,7 @@ class GameController extends Controller
      */
     public function store($user_id)
     {
+        if (Auth::user()->id == $user_id){
         $resultado_tirada_1 = rand(1, 6);
         $resultado_tirada_2 = rand(1, 6);
         $resultado_final = $resultado_tirada_1 + $resultado_tirada_2;
@@ -48,6 +49,10 @@ class GameController extends Controller
         $mensaje .= $victoria ? "Has ganado" : "Has perdido";
 
         return response()->json(['message' => $mensaje], 201);
+        }
+        else{
+            return response()->json('No puedes jugar partidas como otro usuario' , 201);
+        }
     }
     /**
      * Display the specified resource.
