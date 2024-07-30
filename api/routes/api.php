@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\API\AuthController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -13,16 +14,22 @@ Route::post('/players', [UserController::class, 'store']);
 
 Route::put('/players/{id}', [UserController::class, 'update']);
 
-Route::post('/players/{id}/games', [GameController::class, 'create']);
 
 Route::delete('/players/{id}/games', [GameController::class, 'delete']);
 
-Route::get('/players', [UserController::class, 'showAll']);
+Route::get('/players/ranking', [UserController::class, 'ranking']);
 
-Route::get('/players/{id}/games', [GameController::class, 'show']);
+Route::get('/players/ranking/loser', [UserController::class, 'getTheBiggestLoser']);
 
-Route::get('/players/ranking', [UserController::class, 'showRanking']);
+Route::get('/players/ranking/winner', [UserController::class, 'getTheBiggestWinner']);
 
-Route::get('/players/ranking/loser', [UserController::class, 'showWorst']);
+Route::post('login', [AuthController::class, 'login']);
 
-Route::get('/players/ranking/winner', [UserController::class, 'showTop']);
+Route::middleware('auth:api')->group(function() {
+    Route::post('/players/{id}/games', [GameController::class, 'store']);
+
+    //admin requests
+    Route::get('/players/{id}/games', [GameController::class, 'show']);
+    Route::get('/players', [UserController::class, 'index']);
+});
+
