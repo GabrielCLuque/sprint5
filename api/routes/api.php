@@ -34,3 +34,4 @@ Route::middleware('auth:api')->group(function() {
     Route::post('/players/{id}/games', [GameController::class, 'store']);
 });
 
+
