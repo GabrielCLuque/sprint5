@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Game;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -265,7 +266,7 @@ class UserController extends Controller
 
     $user = User::create([
         'email' => $validatedData['email'],
-        'password' => bcrypt($validatedData['password']),
+        'password' => Hash::make($validatedData['password']),
         'user_name' => $userName,
     ]);
 
