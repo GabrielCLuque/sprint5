@@ -29,5 +29,6 @@ Route::middleware('auth:api')->group(function() {
     Route::get('/players/{id}/games', [GameController::class, 'show']);
     Route::get('/players', [UserController::class, 'index']);
     Route::delete('/players/{id}/games', [GameController::class, 'destroy']);
+    Route::put('/players/{id}', [UserController::class, 'update']);
 });
 
