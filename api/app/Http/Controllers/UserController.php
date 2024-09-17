@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Game;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 class UserController extends Controller
 {
     /**
@@ -13,6 +14,8 @@ class UserController extends Controller
      */
     public function index()
     {
+
+    if (Auth::user()->admin_status === 1){
         $users = User::all();
         $games = Game::all();
 
@@ -42,6 +45,10 @@ class UserController extends Controller
         }
 
         return response()->json($ratiopercentage, 201);
+        }
+        else{
+            return response()->json(['error'=>'Esta acción requiere el estatus de administrador'], 403);
+        }
     }
     //devuelve la media
     public function ranking()
@@ -251,7 +258,7 @@ class UserController extends Controller
     $validatedData = $request->validate([
         'email' => 'required|string|email|max:255|unique:users',
         'password' => 'required|string|min:8',
-        'user_name' => 'nullable|string|max:255',
+        'user_name' => 'nullable|string|max:30',
     ]);
 
     $userName = $validatedData['user_name'] ?? 'Anonimo';
@@ -265,7 +272,7 @@ class UserController extends Controller
 
     $user = User::create([
         'email' => $validatedData['email'],
-        'password' => bcrypt($validatedData['password']),
+        'password' => Hash::make($validatedData['password']),
         'user_name' => $userName,
     ]);
 
@@ -292,10 +299,41 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, int $id)
     {
-        //
+    if (Auth::user()->id == $id || Auth::user()->admin_status == 1 ){
+        $validatedData = $request->validate([
+            'user_name' => 'nullable|string|max:30'
+           ]);
+                $userName = $validatedData['user_name'] ?? 'Anonimo';
+                if ($userName === 'Anonimo'){
+                    $user = User::findOrFail($id);
+                    $user->user_name = 'Anonimo';
+                    $user->save();
+                        return response()->json(['message' => 'Campo vacío, nombre actualizado a anonimo.', 'user_name'=> $user->user_name], 201);
+
+                }
+
+                else {
+                        $existingUser = User::where('user_name', $userName)->first();
+                        if ($existingUser) {
+                                return response()->json(['error' => 'El nombre de usuario ya está en uso.'], 422);
+                        }
+                        else{
+                            $user = User::findOrFail($id);
+                            $user->user_name = $validatedData['user_name'];
+                            $user->save();
+                                return response()->json(['message' => 'Nombre actualizado correctamente.', 'user_name'=> $user->user_name], 201);
+                            }
+
+                    }
+            }
+        else{
+            return response()->json('No estas autorizado para realizar esta acción.' , 201);
+        }
     }
+
+
 
     /**
      * Remove the specified resource from storage.
