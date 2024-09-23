@@ -254,7 +254,7 @@ class UserController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
+{
     $validatedData = $request->validate([
         'email' => 'required|string|email|max:255|unique:users',
         'password' => 'required|string|min:8',
@@ -266,7 +266,11 @@ class UserController extends Controller
     if ($userName !== 'Anonimo') {
         $existingUser = User::where('user_name', $userName)->first();
         if ($existingUser) {
-            return response()->json(['error' => 'El nombre de usuario ya está en uso.'], 422);
+            return response()->json([
+                'errors' => [
+                    'user_name' => ['El nombre de usuario ya está en uso.']
+                ]
+            ], 422);
         }
     }
 
@@ -277,7 +281,8 @@ class UserController extends Controller
     ]);
 
     return response()->json(['message' => 'Usuario creado correctamente', 'user' => $user], 201);
-    }
+}
+
 
 
     /**
