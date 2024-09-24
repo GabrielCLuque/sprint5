@@ -14,24 +14,22 @@ Route::post('/players', [UserController::class, 'store']);
 
 Route::put('/players/{id}', [UserController::class, 'update']);
 
-
-Route::delete('/players/{id}/games', [GameController::class, 'delete']);
-
-Route::get('/players', [UserController::class, 'index']);
-
-Route::get('/players/{id}/games', [GameController::class, 'show']);
-
-
 Route::get('/players/ranking', [UserController::class, 'ranking']);
 
 Route::get('/players/ranking/loser', [UserController::class, 'getTheBiggestLoser']);
 
 Route::get('/players/ranking/winner', [UserController::class, 'getTheBiggestWinner']);
 
+Route::get('/players/{id}/games', [GameController::class, 'show']);
+
 Route::post('login', [AuthController::class, 'login']);
 
 Route::middleware('auth:api')->group(function() {
     Route::post('/players/{id}/games', [GameController::class, 'store']);
-});
 
+    //admin requests
+    Route::get('/players', [UserController::class, 'index']);
+    Route::delete('/players/{id}/games', [GameController::class, 'destroy']);
+    Route::put('/players/{id}', [UserController::class, 'update']);
+});
 
