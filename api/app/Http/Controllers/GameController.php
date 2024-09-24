@@ -59,7 +59,7 @@ class GameController extends Controller
      */
     public function show(int $id)
     {
-        if (Auth::user()->admin_status === 1){
+
         $user = User::find($id);
 
         if (!$user) {
@@ -87,10 +87,8 @@ class GameController extends Controller
 
         return response()->json($games, 200);
         }
-        else{
-            return response()->json(['error'=>'Esta acción requiere el estatus de administrador'], 403);
-        }
-    }
+
+
 
     /**
      * Show the form for editing the specified resource.
@@ -111,8 +109,20 @@ class GameController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Game  $game)
+    public function destroy(int $id)
     {
-        //
+        if (Auth::user()->admin_status === 1){
+        $games = Game::all();
+        foreach ($games as $game){
+            if ($game->user_id == $id){
+                $game->delete();
+            }
+        }
+        return response()->json(['message' => 'Partidas del usuario reset.'], 201);
+        }
+        else{
+            return response()->json(['error'=>'Esta acción requiere el estatus de administrador'], 403);
+        }
+
     }
 }
