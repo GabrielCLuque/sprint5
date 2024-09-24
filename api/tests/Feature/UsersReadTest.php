@@ -13,7 +13,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Database\Seeders\UsersTestSeeder;
 use Database\Seeders\GamesTestSeeder;
 use Illuminate\Support\Facades\DB;
-use PHPUnit\Framework\Attributes\DataProvider;
 
 class UsersReadTest extends TestCase
 {
