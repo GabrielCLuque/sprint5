@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Game;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 class GameController extends Controller
 {
     /**
@@ -29,6 +29,7 @@ class GameController extends Controller
      */
     public function store($user_id)
     {
+        if (Auth::user()->id == $user_id){
         $resultado_tirada_1 = rand(1, 6);
         $resultado_tirada_2 = rand(1, 6);
         $resultado_final = $resultado_tirada_1 + $resultado_tirada_2;
@@ -48,12 +49,18 @@ class GameController extends Controller
         $mensaje .= $victoria ? "Has ganado" : "Has perdido";
 
         return response()->json(['message' => $mensaje], 201);
+        }
+        else{
+            return response()->json(['message' => 'No puedes jugar partidas como otro usuario'], 403);
+
+        }
     }
     /**
      * Display the specified resource.
      */
     public function show(int $id)
     {
+
         $user = User::find($id);
 
         if (!$user) {
@@ -80,7 +87,9 @@ class GameController extends Controller
         });
 
         return response()->json($games, 200);
-    }
+        }
+
+
 
     /**
      * Show the form for editing the specified resource.
@@ -101,8 +110,20 @@ class GameController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Game  $game)
+    public function destroy(int $id)
     {
-        //
+        if (Auth::user()->admin_status === 1){
+        $games = Game::all();
+        foreach ($games as $game){
+            if ($game->user_id == $id){
+                $game->delete();
+            }
+        }
+        return response()->json(['message' => 'Partidas del usuario reset.'], 201);
+        }
+        else{
+            return response()->json(['error'=>'Esta acción requiere el estatus de administrador'], 403);
+        }
+
     }
 }
