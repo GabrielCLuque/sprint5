@@ -51,7 +51,8 @@ class GameController extends Controller
         return response()->json(['message' => $mensaje], 201);
         }
         else{
-            return response()->json('No puedes jugar partidas como otro usuario' , 201);
+            return response()->json(['message' => 'No puedes jugar partidas como otro usuario'], 403);
+
         }
     }
     /**
@@ -123,6 +124,5 @@ class GameController extends Controller
         else{
             return response()->json(['error'=>'Esta acción requiere el estatus de administrador'], 403);
         }
-
     }
 }
