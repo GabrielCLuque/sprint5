@@ -15,18 +15,14 @@ class UsersUpdateTest extends TestCase
     {
         parent::setUp();
 
-        $this->artisan('migrate');
-        $this->artisan('db:seed', ['--class' => \Database\Seeders\UsersTestSeeder::class]);
+
 
         if (!file_exists(storage_path('oauth-private.key')) || !file_exists(storage_path('oauth-public.key'))) {
             \Artisan::call('passport:keys');
         }
+        $this->artisan('migrate');
+        $this->artisan('db:seed', ['--class' => \Database\Seeders\UsersTestSeeder::class]);
 
-        \Artisan::call('passport:client', [
-            '--name' => 'TestClient',
-            '--no-interaction' => true,
-            '--personal' => true
-        ]);
     }
 
     public function test_user_can_change_own_name()
