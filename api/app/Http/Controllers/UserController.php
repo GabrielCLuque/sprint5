@@ -232,35 +232,43 @@ public function getTheBiggestWinner() {
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-{
-    $validatedData = $request->validate([
-        'email' => 'required|string|email|max:255|unique:users',
-        'password' => 'required|string|min:8',
-        'user_name' => 'nullable|string|max:30',
-    ]);
+    {
+        $validatedData = $request->validate([
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'user_name' => [
+                'nullable',
+                'string',
+                'max:30',
+                'regex:/^[\pL\pN\s]+$/u' // should only accept regular characters
+            ],
+        ]);
 
-    $userName = $validatedData['user_name'] ?? 'Anonimo';
+        $userName = trim($validatedData['user_name'] ?? '');
 
-    if ($userName !== 'Anonimo') {
-        $existingUser = User::where('user_name', $userName)->first();
-        if ($existingUser) {
-            return response()->json([
-                'errors' => [
-                    'user_name' => ['El nombre de usuario ya está en uso.']
-                ]
-            ], 422);
+        if ($userName === '') {
+            $userName = 'Anonimo';
         }
+
+        if ($userName !== 'Anonimo') {
+            $existingUser = User::where('user_name', $userName)->first();
+            if ($existingUser) {
+                return response()->json([
+                    'errors' => [
+                        'user_name' => ['El nombre de usuario ya está en uso.']
+                    ]
+                ], 422);
+            }
+        }
+
+        $user = User::create([
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password']),
+            'user_name' => $userName,
+        ]);
+
+        return response()->json(['message' => 'Usuario creado correctamente', 'user' => $user], 201);
     }
-
-    $user = User::create([
-        'email' => $validatedData['email'],
-        'password' => Hash::make($validatedData['password']),
-        'user_name' => $userName,
-    ]);
-
-    return response()->json(['message' => 'Usuario creado correctamente', 'user' => $user], 201);
-}
-
 
 
     /**

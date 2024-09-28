@@ -103,6 +103,27 @@ class UserCreateTest extends TestCase
                 'expectedStatus' => 422,
                 'expectedErrorField' => 'user_name',
             ],
+            'username_only_spaces' => [
+                'email' => 'newuserwithspaces@example.com',
+                'password' => 'password123',
+                'user_name' => '   ',
+                'expectedStatus' => 201,
+                'expectedErrorField' => null,
+            ],
+            'case_insensitive_duplicate_username' => [
+                'email' => 'duplicatecaps@example.com',
+                'password' => 'password123',
+                'user_name' => 'REPEATEDUSER',
+                'expectedStatus' => 422,
+                'expectedErrorField' => 'user_name',
+            ],
+            'batman_symbol_username' => [
+                'email' => 'batmanfan@example.com',
+                'password' => 'password123',
+                'user_name' => '🦇',
+                'expectedStatus' => 422,
+                'expectedErrorField' => 'user_name',
+            ],
         ];
     }
 }
