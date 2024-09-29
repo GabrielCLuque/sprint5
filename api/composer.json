@@ -5,9 +5,9 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.2.12",
         "laravel/framework": "^11.0",
-        "laravel/passport": "*",
+        "laravel/passport": "12.3.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9"
     },
@@ -17,8 +17,8 @@
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
-        "php-mock/php-mock-phpunit": "*",
-        "phpunit/phpunit": "*"
+        "php-mock/php-mock-phpunit": "^2.10.0",
+        "phpunit/phpunit": "^11.3.6"
     },
     "autoload": {
         "psr-4": {
