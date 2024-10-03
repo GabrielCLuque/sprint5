@@ -284,37 +284,44 @@ public function getTheBiggestWinner() {
      */
     public function update(Request $request, int $id)
     {
-    if (Auth::user()->id == $id || Auth::user()->admin_status == 1 ){
-        $validatedData = $request->validate([
-            'user_name' => 'nullable|string|max:30'
-           ]);
-                $userName = $validatedData['user_name'] ?? 'Anonimo';
-                if ($userName === 'Anonimo'){
-                    $user = User::findOrFail($id);
-                    $user->user_name = 'Anonimo';
-                    $user->save();
-                        return response()->json(['message' => 'Campo vacío, nombre actualizado a anonimo.', 'user_name'=> $user->user_name], 201);
+        if (Auth::user()->id == $id || Auth::user()->admin_status == 1) {
+            $validatedData = $request->validate([
+                'user_name' => 'nullable|string|max:30'
+            ]);
 
-                }
+            // case only spaces for name
+            $userName = trim($validatedData['user_name'] ?? '');
 
-                else {
-                        $existingUser = User::where('user_name', $userName)->first();
-                        if ($existingUser) {
-                                return response()->json(['error' => 'El nombre de usuario ya está en uso.'], 422);
-                        }
-                        else{
-                            $user = User::findOrFail($id);
-                            $user->user_name = $validatedData['user_name'];
-                            $user->save();
-                                return response()->json(['message' => 'Nombre actualizado correctamente.', 'user_name'=> $user->user_name], 201);
-                            }
-
-                    }
+            if ($userName === '') {
+                $userName = 'Anonimo';
+                $user = User::findOrFail($id);
+                $user->user_name = $userName;
+                $user->save();
+                return response()->json(['message' => 'Campo vacío, nombre actualizado a Anonimo.', 'user_name' => $user->user_name], 201);
             }
-        else{
-            return response()->json('No estas autorizado para realizar esta acción.' , 201);
+
+            if ($userName === 'Anonimo') {
+                $user = User::findOrFail($id);
+                $user->user_name = $userName;
+                $user->save();
+                return response()->json(['message' => 'Nombre actualizado correctamente.', 'user_name' => $user->user_name], 201);
+            }
+
+            $existingUser = User::where('user_name', $userName)->where('id', '!=', $id)->first();
+            if ($existingUser) {
+                return response()->json(['error' => 'El nombre de usuario ya está en uso.'], 422);
+            }
+
+            $user = User::findOrFail($id);
+            $user->user_name = $userName;
+            $user->save();
+
+            return response()->json(['message' => 'Nombre actualizado correctamente.', 'user_name' => $user->user_name], 201);
+        } else {
+            return response()->json('No estás autorizado para realizar esta acción.', 403);
         }
     }
+
 
 
 

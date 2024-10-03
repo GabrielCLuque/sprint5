@@ -124,6 +124,5 @@ class GameController extends Controller
         else{
             return response()->json(['error'=>'Esta acción requiere el estatus de administrador'], 403);
         }
-
     }
 }
