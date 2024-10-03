@@ -48,7 +48,8 @@ class GameController extends Controller
         $mensaje .= "Resultado final: $resultado_final, ";
         $mensaje .= $victoria ? "Has ganado" : "Has perdido";
 
-        return response()->json(['message' => $mensaje], 201);
+        return response()->json(['message' => $mensaje,['resultado1'=>$resultado_tirada_1,'resultado2'=>$resultado_tirada_2,
+        'resultado_final'=> $resultado_final]], 201);
         }
         else{
             return response()->json(['message' => 'No puedes jugar partidas como otro usuario'], 403);
